@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>carousel</title>
+  <!-- <script src="../static/plugJs/js/vue.js"></script>
+  <script src="../static/plugJs/element-ui/lib/index.js"></script>
+  <link rel="stylesheet" href="../static/plugJs/element-ui/lib/theme-chalk/index.css" />
+
+  <script src="../static/plugJs/js/axios-0.18.0.js"></script> -->
+  <style>
+    .all {
+      width: 100%;
+      height: 100%;
+      margin: 0 0 ;
+      background-color: #f0f2f5;
+    }
+    .all .box {
+      box-shadow: 1.5px 1.5px  #c2c3c6;
+      position: relative;
+      margin-left: 215px;
+      top: 57px;
+      margin-right: 15px;
+      border-radius: 7px;
+      box-sizing: border-box;
+      /* height: 300px; */
+      background-color: #fff;
+    }
+    .title {
+      display: flex;
+      justify-content: space-between;
+      margin-left: 20px;
+      margin-right: 29px;
+    }
+    .title .carouselchar {
+      margin-top: 5px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .title .button {
+      margin-top: 3px;
+      border-radius: 3px;
+      border: 1px solid #2ba59a;
+      color: #2ba59a;
+      padding: 6px 6px;
+      font-size: 15px;
+    }
+    .title .button:hover {
+      cursor: pointer;
+    }
+    .table {
+      margin-left: 20px;
+      margin-right: 20px;
+    }
+    .table .margin {
+      vertical-align: center;
+      text-align: start;
+      font-weight: normal;
+      width: 400px;
+      height: 53px;
+    }
+    .table .margins {
+      display: flex;
+      vertical-align: center;
+      text-align: start;
+      font-weight: normal;
+      width: 400px;
+      height: 53px;
+    }
+    .table td {
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .table th {
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .table .margins .viewer-button {
+      width: 70px;
+      height: 30px;
+      background-color: #2ba59a;
+      color: #fff;
+      margin-top: 10px;
+      margin-right: 20px;
+      border-radius: 5px;
+      text-align: center;
+      line-height: 30px;
+    }
+    .tr:hover {
+      background-color: #f7f7f7;
+    }
+    .table .margins .viewer-button:hover {
+      cursor: pointer;
+    }
+    .table .margins .viewer-button:active {
+      background-color: rgba(47, 164, 154, 0.7);
+    }
+    #overlay,
+    #overlays {
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    font-size: 16px;
+    /* IE9以下不支持rgba模式 */
+    background-color: rgba(0, 0, 0, 0.5);
+    /* 兼容IE8及以下 */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#7f000000,endColorstr=#7f000000);
+    display: none;
+  }
+  /* 弹出框主体 */
+  .popup {
+    background-color: #ffffff;
+    max-width: 400px;
+    min-width: 200px;
+    height: 200px;
+    border-radius: 5px;
+    margin: 100px auto;
+    text-align: center;
+  }
+  /* 弹出框的标题 */
+  .popup_title {
+    height: 60px;
+    line-height: 60px;
+    border-bottom: solid 1px #cccccc;
+  }
+  input {
+    margin: 10px 10px;
+  }
+  /* 弹出框的按钮栏 */
+  .popup_btn {
+    margin-top: 20px;
+    padding-bottom: 10px;
+  }
+  /* 弹出框的按钮 */
+  .popup_btn button {
+    color: #778899;
+    width: 40%;
+    height: 40px;
+    cursor: pointer;
+    border: solid 1px #cccccc;
+    border-radius: 5px;
+    margin: 5px 10px;
+    color: #ffffff;
+    background-color: #337ab7;
+  }
+   #overlays .popup_img {
+    background-color: #ffffff;
+    max-width:1000px;
+    height: 800px;
+    border-radius: 5px;
+    margin:50px auto;
+    text-align: center;
+   }
+   #overlays .popup_img img {
+    width: 900px;
+    height: 700px;
+    margin: 50px 25px;
+   }
+  </style>
+</head>
+<body>
+  <script src="/js/staticFile/jquery.js"></script>
+  <script src="https://cdn.staticfile.org/vue/2.6.9/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+	<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+  <div th:replace="common/header::html"></div>
+  <div class="all">
+    <div class="box">
+      <div class="title">
+        <div class="carouselchar">首页轮播</div>
+        <div class="button" @click="showPopup()">新增轮播内容</div>
+        <div id="overlay">
+          <div class="popup">
+            <p class="popup_title">请输入新增加轮播图地址</p>
+            <input type="text" placeholder="在此处输入地址" v-model="newaddurl">
+            <div class="popup_btn" @click="hidePopup()">
+              <button class="cancelBtn" >取消</button>
+              <button class="confirmBtn" @click="clickadd">保存</button>
+            </div>
+          </div>
+        </div> 
+
+      </div>
+        <table class="table" border="0" cellpadding="0" cellspacing="0">
+          <thead>
+            <tr>
+              <th class="margin">id</th>
+              <th class="margin">预览图</th>
+              <th class="margin">最后修改时间</th>
+              <th class="margin">操作</th>
+            </tr>
+          </thead>
+          <!-- <div class="border"></div> -->
+          <tbody>
+                <tr v-for="(item,index) in arrays" :key="index" class="tr">
+                <td class="margin">{{item.id}}</td>
+                <td class="margin"><img :src="item.imgUrl" style="width: 100px; height: 50px;"></td>
+                <td class="margin">{{item.createTime}}</td>
+                <td class="margins">
+                  <div>
+                    <div class="viewer-button" @click="showPopup()">编辑</div>
+                  <div id="overlay">
+                    <div class="popup">
+                      <p class="popup_title">请输入新轮播图地址</p>
+                      <input type="text" :placeholder="item.imgUrl" v-model="newurl">
+                      <div class="popup_btn">
+                        <button class="cancelBtn" @click="hidePopup()">取消</button>
+                        <button class="confirmBtn" @click="savePopup(item.id)">保存</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                  <div>
+                    <div class="viewer-button" @click="showPopups(item.imgUrl)" >查看内容</div>                    <div id="overlays" @click="hidePopups()">
+                      <div class="popup_img">
+                        <img :src="currentImgUrl" >
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="viewer-button" @click="clickdelete(item.id)">删除</div>
+                  </div>
+                </td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+  </div>   
+
+      </script>
+      <script>
+        var appVM = new Vue({
+          el: '.all',
+          data: {
+            arrays: [],
+            newurl:'',
+            newaddurl:'',
+            currentImgUrl: '',
+          },
+          methods: {
+            showPopup() {
+              var overlay = document.getElementById("overlay");
+               overlay.style.display = "block";
+            },
+            
+             hidePopup(){
+               var overlay = document.getElementById("overlay");
+               overlay.style.display = "none";
+           },
+           savePopup(e){
+            axios.put('http://localhost:8081/carousel/updateCarousel',
+            {
+              "imageUrl":this.newurl,
+              "id":e
+            }),
+            location.reload()
+            this.hidePopup()
+           },
+            showPopups(imgUrl) {
+              this.currentImgUrl = imgUrl;
+              var overlays = document.getElementById("overlays");
+              overlays.style.display = "block";
+            },
+            hidePopups(){
+              var overlays = document.getElementById("overlays");
+              overlays.style.display = "none";
+      },
+          
+            fetchData() {
+              axios.get('http://localhost:8081/carousel/getAllCarousels')
+                .then(response => {
+                  console.log(response.data.data);
+                  this.arrays = response.data.data;
+                })
+                .catch(error => {
+                  console.error('Error fetching data:', error);
+                });
+            },
+            clickdelete(id){
+              axios.delete(`http://localhost:8081/carousel/deleteCarousel/${id}`)
+              .then(function (response) {
+                location.reload();
+                console.log('Data deleted successfully:', response.data);
+              })
+              .catch(function (error) {
+                console.error('Error deleting data:', error);
+              });
+          },
+          clickadd(){
+
+              axios.post('http://localhost:8081/carousel/addCarousel',{
+                "imageUrl":this.newaddurl
+              })
+              location.reload()
+              .then(function (response) {
+                console.log('Data add successfully:', response.data);
+              })
+              .catch(function (error) {
+                console.error('Error adding data:', error);
+              });
+          }
+          },
+         
+          mounted() {
+            this.fetchData();
+          }
+        });
+      </script>
+</body>
+</html>

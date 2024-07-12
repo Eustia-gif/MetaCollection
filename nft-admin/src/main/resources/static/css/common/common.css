@@ -1,0 +1,29 @@
+@charset "UTF-8";
+
+[v-cloak] {
+	display: none;
+}
+
+body {
+	background: rgb(240, 242, 245);
+}
+
+.header-nav {
+	background: #3b444859;
+	width: 200px;
+    position: fixed;
+	height: 100%;
+}
+
+.query-cond .q-field {
+	min-width: 210px;
+	max-width: 210px;
+}
+
+.query-sub-total {
+	margin-top: 10px;
+	display: inline-block;
+	background: rgb(0 0 0/ 12%);
+	padding: 6px;
+	color: #1976d2;
+}

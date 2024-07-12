@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<link href="https://fonts.googleapis.com/css?family=Material+Icons" rel="stylesheet" type="text/css">
+	<link href="/js/quasar/quasar.min.css" rel="stylesheet" type="text/css">
+	<style type="text/css">
+		#q-app {
+			padding: 0
+		}
+	</style>
+</head>
+
+<body>
+	<script src="https://cdn.staticfile.org/vue/2.6.9/vue.min.js"></script>
+	<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+	<script src="/js/quasar/quasar.umd.min.js"></script>
+	<script src="/js/quasar/zh-hans.umd.min.js"></script>
+	<script src="/js/common/common.js"></script>
+	<div id="q-app">
+		<template> <q-layout> <q-page-container> <q-page class="row justify-center items-center ">
+<!--						style="background-image:url('/images/VCG211447218624-UFW.jpg');background-size:cover;">-->
+						<div class="column q-pa-lg">
+							<div class="row">
+								<q-card square class="shadow-24" style="width:400px;height:485px;">
+									<q-card-section class="bg-light-blue-10">
+										<h4 class="text-h5 text-white q-my-md" style="text-align: center">后台管理系统</h4>
+<!--										<div class="absolute-bottom-right q-pr-md" style="transform: translateY(50%);">-->
+<!--&lt;!&ndash;											<q-btn fab icon="add" color="secondary" class="glossy" round></q-btn>&ndash;&gt;-->
+<!--										</div>-->
+									</q-card-section> <q-card-section> <q-form class="q-px-sm q-pt-xl q-pb-lg"> <q-input
+												:rules="[val => val && val.length > 0 || '']" square clearable
+												v-model="userName" label="请输入账号..."> <template v-slot:prepend> <q-icon
+														name="account_circle"></q-icon> </template> </q-input> <q-input
+												:rules="[
+          val => val !== null && val !== '' || '',
+        ]" square v-model="loginPwd" type="password" label="请输入密码..."> <template v-slot:prepend> <q-icon
+														name="password"></q-icon> </template> </q-input> </q-form>
+									</q-card-section> <q-card-actions class="q-px-lg"> <q-btn rounded
+											class="glossy full-width text-white" unelevated size="lg" color="teal"
+											label="登录" @click="login"></q-btn> </q-card-actions> </q-card>
+							</div>
+						</div>
+					</q-page> </q-page-container> </q-layout> </template>
+	</div>
+	<script type="text/javascript">
+		Quasar.lang.set(Quasar.lang.zhHans)
+		var appVM = new Vue({
+			el: '#q-app',
+			data: function () {
+				return {
+					userName: '',
+					loginPwd: ''
+				}
+			},
+			mounted: function () {
+			},
+			methods: {
+
+				login: function () {
+					var that = this;
+					if (that.userName === null || that.userName === '') {
+						that.$q.notify({
+							type: 'negative',
+						});
+						return;
+					}
+					if (that.loginPwd == null || that.loginPwd == '') {
+						that.$q.notify({
+							type: 'negative',
+						});
+						return;
+					}
+					that.$http.post('/login', {
+						userName: that.userName,
+						loginPwd: that.loginPwd
+					}, {
+						emulateJSON: true
+					}).then(function (res) {
+						var tokenInfo = res.body.data;
+						window.sessionStorage.setItem('tokenName', tokenInfo.tokenName);
+						window.sessionStorage.setItem('tokenValue', tokenInfo.tokenValue);
+						that.loadMenu();
+					});
+				},
+
+				loadMenu: function () {
+					var that = this;
+					that.$http.get('/rbac/findMyMenuTree').then(function (res) {
+						var menus = res.body.data;
+						for (var i = 0; i < menus.length; i++) {
+							var menu = menus[i];
+							if (menu.url != null && menu.url != '') {
+								window.location.href = menu.url;
+								return;
+							}
+							for (var j = 0; j < menu.subMenus.length; j++) {
+								var subMenu = menu.subMenus[j];
+								if (subMenu.url != null && subMenu.url != '') {
+									window.location.href = subMenu.url;
+									return;
+								}
+							}
+						}
+					});
+				},
+			},
+		});
+	</script>
+</body>
+<style>
+</style>
+
+</html>
